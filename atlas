@@ -27,12 +27,19 @@ if __name__ == "__main__":
 
     # Load Page Ranges
     page_ranges = []
+    sum_pages = 0
     for range in config['ranges']:
         for k, v in config.iteritems():
             if not k in range:
                 range[k] = v;
 
-        page_ranges.append(PageRange(range))
+        range['page_number_offset'] = sum_pages
+
+        current = PageRange(range)
+        page_ranges.append(current)
+
+        sum_pages += current.count_pages()
+        print sum_pages
 
     # Produce final PDF
     final_pdf = PDF.PdfFileWriter()

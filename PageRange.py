@@ -65,9 +65,11 @@ class PageRange:
             for x, x_boundary in enumerate(page_boundaries[0]):
                 page_config = self.config
                 page_config['page_map_size'] = map_size_per_page
-                page_config['page_number'] = len(self.pages) + 1
+                page_config['page_number'] = self.config['page_number_offset'] + len(self.pages) + 1
 
                 self.pages.append(Page(self, (x_boundary, y_boundary), page_config))
+    def count_pages(self):
+        return len(self.pages)
 
     def embed_to_final_pdf(self, final_pdf):
         for page in self.pages:
