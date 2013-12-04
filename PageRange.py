@@ -104,6 +104,7 @@ class PageRange:
         layer = mapnik.Layer('python')
         layer.datasource = data_source
         layer.styles.append('directory')
+        layer.clear_label_cache = True
         self.map.layers.append(layer)
 
     def render(self, final_pdf):
