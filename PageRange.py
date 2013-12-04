@@ -1,8 +1,8 @@
+from defs import *
 from Page import *
-import mapnik
 
 class PageRange:
-    def __init__(self, common, config):
+    def __init__(self, config):
         self.data = []
         self.config = config
         print config
@@ -12,10 +12,10 @@ class PageRange:
         mapnik.load_map(self.map, config['map_file'])
 
         # ensure the target map projection is mercator
-        self.map.srs = common['merc'].params()
+        self.map.srs = merc.params()
 
         # set up projection
-        self.map.transform = mapnik.ProjTransform(common['longlat'], common['merc'])
+        self.map.transform = mapnik.ProjTransform(longlat, merc)
 
         # Mapnik: set up bbox on correct projection and scale
         self.bbox = mapnik.Box2d(*self.config['bounds'])
