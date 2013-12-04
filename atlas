@@ -16,10 +16,12 @@ if __name__ == "__main__":
         'map_file': "foo.mapnik",
         'output': "map.pdf",
         'ranges': [{
+            'id': 'main',
             'bounds': (15.4410,47.072,15.4451,47.0664),
             'scale': 2000
         },
         {
+            'include_page_bounds': [ 'main' ],
             'bounds': (15.4,47.0,15.5,47.1),
             'scale': 100000
         }]

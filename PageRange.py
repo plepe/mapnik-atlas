@@ -81,6 +81,39 @@ class PageRange:
     def count_pages(self):
         return len(self.pages)
 
+    def include_page_bounds(self):
+        overview_csv = 'wkt;page_number\n'
+        for page_range in self.config['include_page_bounds']:
+            page_range = get_page_range(page_range)
+
+            if page_range is not None:
+                overview_csv += '\n'.join(page_range.page_bounds_as_csv()) + '\n'
+        print overview_csv
+
+        style = mapnik.Style()
+        rule = mapnik.Rule()
+        rule.symbols.append(mapnik.LineSymbolizer(mapnik.Color('black'), 1))
+        style.rules.append(rule)
+        self.map.append_style('directory', style)
+        data_source = mapnik.CSV(inline=overview_csv)
+        layer = mapnik.Layer('python')
+        layer.datasource = data_source
+        layer.styles.append('directory')
+        self.map.layers.append(layer)
+
     def render(self, final_pdf):
+        if 'include_page_bounds' in self.config:
+            self.include_page_bounds()
+
         for page in self.pages:
             page.render(final_pdf)
+
+    def page_bounds_as_csv(self):
+        ret = []
+
+        for page in self.pages:
+            r = page.page_bounds_as_csv()
+            if r is not None:
+                ret += r
+
+        return ret

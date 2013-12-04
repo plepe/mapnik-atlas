@@ -82,3 +82,12 @@ class Page:
         )
 
         final_pdf.addPage(page_final)
+
+    def page_bounds_as_csv(self):
+        geom = self.map.transform.backward(self.bbox)
+        return ['"POLYGON((' + repr(geom.minx) + ' ' + repr(geom.miny) + ',' + \
+                ' ' + repr(geom.maxx) + ' ' + repr(geom.miny) + ',' + \
+                ' ' + repr(geom.maxx) + ' ' + repr(geom.maxy) + ',' + \
+                ' ' + repr(geom.minx) + ' ' + repr(geom.maxy) + ',' + \
+                ' ' + repr(geom.minx) + ' ' + repr(geom.miny) + '))"' + \
+                ';' + str(self.config['page_number'])]
