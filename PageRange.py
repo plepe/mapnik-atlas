@@ -73,7 +73,7 @@ class PageRange:
         self.pages = []
         for y, y_boundary in enumerate(page_boundaries[1]):
             for x, x_boundary in enumerate(page_boundaries[0]):
-                page_config = self.config
+                page_config = self.config.copy()
                 page_config['page_map_size'] = map_size_per_page
                 page_config['page_number'] = self.config['page_number_offset'] + len(self.pages) + 1
 

@@ -37,19 +37,22 @@ class Page:
                 self.offset[1] + self.config['page_map_size'][1] + self.overlap))
         )
 
+        self.file_name = 'map-' + str(self.config['page_number']) + '.pdf'
+
+    def render(self, final_pdf):
+        # Make sure map is correctly sized
         self.map.resize(
             int(round(self.config['page_map_size'][0] + self.overlap * 2)),
             int(round(self.config['page_map_size'][1] + self.overlap * 2))
         )
 
+        # Important: select correct map region
         self.map.zoom_to_box(self.bbox_overlap)
 
         # Fix zoom
         self.map.zoom(self.config['scale'] / self.map.scale_denominator())
 
-        self.file_name = 'map-' + str(self.config['page_number']) + '.pdf'
-
-    def render(self, final_pdf):
+        # Finally render map
         mapnik.render_to_file(self.map, self.file_name)
 
         # page_background is an empty page with the final page size
