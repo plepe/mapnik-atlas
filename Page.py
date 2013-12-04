@@ -114,6 +114,9 @@ class Page:
                 stroke=0, fill=1
             )
 
+        page_overlay.setFillColor(colors.black)
+        page_overlay.drawString(10, 10, str(self.config['page_number']))
+
         page_overlay.showPage()
         page_overlay.save()
 
