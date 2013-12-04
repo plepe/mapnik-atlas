@@ -44,6 +44,6 @@ if __name__ == "__main__":
     # Produce final PDF
     final_pdf = PDF.PdfFileWriter()
     for range in page_ranges:
-        range.embed_to_final_pdf(final_pdf)
+        range.render(final_pdf)
 
     final_pdf.write(file(config['output'], 'wb'))

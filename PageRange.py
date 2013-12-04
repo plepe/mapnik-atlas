@@ -81,6 +81,6 @@ class PageRange:
     def count_pages(self):
         return len(self.pages)
 
-    def embed_to_final_pdf(self, final_pdf):
+    def render(self, final_pdf):
         for page in self.pages:
-            page.embed_to_final_pdf(final_pdf)
+            page.render(final_pdf)

@@ -48,9 +48,10 @@ class Page:
         self.map.zoom(self.config['scale'] / self.map.scale_denominator())
 
         self.file_name = 'map-' + str(self.config['page_number']) + '.pdf'
+
+    def render(self, final_pdf):
         mapnik.render_to_file(self.map, self.file_name)
 
-    def embed_to_final_pdf(self, final_pdf):
         # page_background is an empty page with the final page size
         page_size_pdf = (
             self.config['page_size'][0] * pdf_unit,
