@@ -93,6 +93,10 @@ class PageRange:
         style = mapnik.Style()
         rule = mapnik.Rule()
         rule.symbols.append(mapnik.LineSymbolizer(mapnik.Color('black'), 1))
+        t = mapnik.TextSymbolizer(mapnik.Expression('[page_number]'), 'DejaVu Sans Book', 12, mapnik.Color('black'))
+        t.halo_fill = mapnik.Color('white')
+        t.halo_radius = 2
+        rule.symbols.append(t)
         style.rules.append(rule)
         self.map.append_style('directory', style)
         data_source = mapnik.CSV(inline=overview_csv)
