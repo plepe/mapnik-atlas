@@ -1,11 +1,21 @@
 from defs import *
 from Page import *
 
+page_ranges = {}
+
+def get_page_range(id):
+    return page_ranges[id]
+
 class PageRange:
     def __init__(self, config):
         self.data = []
         self.config = config
-        print config
+        if 'id' in config:
+            self.id = str(config['id'])
+        else:
+            import uuid
+            self.id = str(uuid.uuid1())
+        page_ranges[self.id] = self
 
         # Initialize Mapnik (with an arbitrary size)
         self.map = mapnik.Map(10000, 10000)
