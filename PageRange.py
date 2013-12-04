@@ -30,3 +30,43 @@ class PageRange:
 
         # total map size without overlap
         self.map_size = (self.map.width, self.map.height)
+
+        # size of map per page
+        map_size_per_page = page_map_size(self.config)
+        print self.map_size, map_size_per_page
+
+        # center bbox on pages
+        count_pages = self.map_size[0] / map_size_per_page[0] + 1,\
+                      self.map_size[1] / map_size_per_page[1] + 1
+        map_offset = (count_pages[0] * map_size_per_page[0] - self.map_size[0]) / 2,\
+                     (count_pages[1] * map_size_per_page[1] - self.map_size[1]) / 2
+
+        # calculate upper left boundary for all pages
+        page_boundaries = range(-map_offset[0], self.map_size[0], map_size_per_page[0]),\
+                          range(-map_offset[1], self.map_size[1], map_size_per_page[1])
+
+        # coord ... a mapnik ViewTransform to project positions in the local
+        # coordinate system
+        self.coord = mapnik.ViewTransform(self.map.width, self.map.height, self.map.envelope())
+
+        # update bbox to page_boundaries
+        self.bbox = mapnik.Box2d(
+            self.coord.backward(mapnik.Coord(
+                page_boundaries[0][0],
+                page_boundaries[1][0])),
+            self.coord.backward(mapnik.Coord(
+                page_boundaries[0][-1] + map_size_per_page[0],
+                page_boundaries[1][-1] + map_size_per_page[1]))
+        )
+
+        # Create Pages
+        self.pages = []
+        for y, y_boundary in enumerate(page_boundaries[1]):
+            for x, x_boundary in enumerate(page_boundaries[0]):
+                page_config = self.config
+                page_config['page_map_size'] = map_size_per_page
+                page_config['page_number'] = len(self.pages) + 1
+
+                self.pages.append(Page(self, (x_boundary, y_boundary), page_config))
+
+        print self.pages
