@@ -69,4 +69,6 @@ class PageRange:
 
                 self.pages.append(Page(self, (x_boundary, y_boundary), page_config))
 
-        print self.pages
+    def embed_to_final_pdf(self, final_pdf):
+        for page in self.pages:
+            page.embed_to_final_pdf(final_pdf)

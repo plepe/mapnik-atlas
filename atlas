@@ -12,12 +12,16 @@ if __name__ == "__main__":
     config = {
         'overlap': 5, # mm
         'page_size': (210, 297), # A4
-        'page_border': 5, # mm
+        'page_border': 10, # mm
         'map_file': "foo.mapnik",
         'output': "map.pdf",
         'ranges': [{
             'bounds': (15.4410,47.072,15.4451,47.0664),
             'scale': 2000
+        },
+        {
+            'bounds': (15.4,47.0,15.5,47.1),
+            'scale': 100000
         }]
     }
 
@@ -29,3 +33,10 @@ if __name__ == "__main__":
                 range[k] = v;
 
         page_ranges.append(PageRange(range))
+
+    # Produce final PDF
+    final_pdf = PDF.PdfFileWriter()
+    for range in page_ranges:
+        range.embed_to_final_pdf(final_pdf)
+
+    final_pdf.write(file(config['output'], 'wb'))
