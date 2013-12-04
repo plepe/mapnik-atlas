@@ -31,9 +31,20 @@ if __name__ == "__main__":
         'overlap': 5, # mm
         'page_size': (210, 297), # A4
         'page_border': 5, # mm
+        'map_file': "foo.mapnik",
         'output': "map.pdf",
         'ranges': [{
             'bounds': (15.4410,47.072,15.4451,47.0664),
             'scale': 2000
         }]
     }
+
+    # Initialize Mapnik (with an arbitrary size)
+    map = mapnik.Map(1024, 1024)
+    mapnik.load_map(map, config['map_file'])
+
+    # ensure the target map projection is mercator
+    map.srs = merc.params()
+
+    # set up projection
+    transform = mapnik.ProjTransform(longlat,merc)
