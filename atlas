@@ -12,6 +12,9 @@ except:
         print('Error: Need to have Mapnik installed, with python bindings enabled.')
         sys.exit()
 
+# Local imports
+from PageRange import *
+
 # Set up projections
 # spherical mercator (most common target map projection of osm data imported with osm2pgsql)
 merc = mapnik.Projection('+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over')
@@ -48,3 +51,8 @@ if __name__ == "__main__":
 
     # set up projection
     transform = mapnik.ProjTransform(longlat,merc)
+
+    # Load Page Ranges
+    page_ranges = []
+    for range in config['ranges']:
+        page_ranges.append(PageRange(range))
