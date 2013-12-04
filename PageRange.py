@@ -19,6 +19,7 @@ class PageRange:
 
         # Initialize Mapnik (with an arbitrary size)
         self.map = mapnik.Map(10000, 10000)
+        self.map.aspect_fix_mode = mapnik.aspect_fix_mode.SHRINK_CANVAS
         mapnik.load_map(self.map, config['map_file'])
 
         # ensure the target map projection is mercator
