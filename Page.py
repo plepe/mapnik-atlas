@@ -84,6 +84,42 @@ class Page:
             (self.config['page_border'] - self.config['overlap']) * pdf_unit
         )
 
+        page_overlay = canvas.Canvas("tmp2.pdf", pagesize=page_size_pdf)
+        page_overlay.setFillColor(colors.white)
+        if self.config['overlap'] < self.config['page_border']:
+            page_overlay.rect(
+                0, 0, \
+                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                page_size_pdf[0] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                0, \
+                page_size_pdf[0], \
+                page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                0, 0, \
+                page_size_pdf[0], \
+                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                0, \
+                page_size_pdf[1] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                page_size_pdf[0], \
+                page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+
+        page_overlay.showPage()
+        page_overlay.save()
+
+        page_overlay = PDF.PdfFileReader(open('tmp2.pdf', 'rb')).getPage(0)
+        page_final.mergePage(page_overlay)
+
         final_pdf.addPage(page_final)
 
     def page_bounds_as_csv(self):
