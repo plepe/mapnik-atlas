@@ -41,6 +41,58 @@ class Page:
 
         self.file_name = 'map-' + str(self.config['page_number']) + '.pdf'
 
+    def crop_map(self, page_final):
+        page_overlay_file = cStringIO.StringIO()
+        page_overlay = canvas.Canvas(page_overlay_file, pagesize=self.page_size_pdf)
+        page_overlay.setFillColor(colors.white)
+        if self.config['overlap'] < self.config['page_border']:
+            page_overlay.rect(
+                0, 0, \
+                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                self.page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                self.page_size_pdf[0] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                0, \
+                self.page_size_pdf[0], \
+                self.page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                0, 0, \
+                self.page_size_pdf[0], \
+                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                stroke=0, fill=1
+            )
+            page_overlay.rect(
+                0, \
+                self.page_size_pdf[1] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
+                self.page_size_pdf[0], \
+                self.page_size_pdf[1], \
+                stroke=0, fill=1
+            )
+
+        page_overlay.showPage()
+        page_overlay.save()
+
+        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
+        page_final.mergePage(page_overlay)
+        page_overlay_file.close()
+
+    def overlay_map(self, page_final):
+# Create HTML-page as overlay
+        page_overlay_file = cStringIO.StringIO()
+        content = file('template-page.html', 'r').read()
+        content = content.format(
+            page_number=str(self.config['page_number'])
+        )
+        pdf = pisa.CreatePDF(cStringIO.StringIO(content), page_overlay_file)
+
+        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
+        page_final.mergePage(page_overlay)
+        page_overlay_file.close()
+
     def render(self, final_pdf):
         # Important: select correct map region
         self.map.zoom_to_box(self.bbox_overlap)
@@ -61,11 +113,10 @@ class Page:
         mapnik.render_to_file(self.map, self.file_name)
 
         # page_background is an empty page with the final page size
-        page_size_pdf = (
+        self.page_size_pdf = (
             self.config['page_size'][0] * pdf_unit,
             self.config['page_size'][1] * pdf_unit
         )
-        print page_size_pdf
 
         print self.config
         map_size_pdf = (
@@ -74,7 +125,7 @@ class Page:
         )
 
         page_background_file = cStringIO.StringIO()
-        page_background = canvas.Canvas(page_background_file, pagesize=page_size_pdf)
+        page_background = canvas.Canvas(page_background_file, pagesize=self.page_size_pdf)
         page_background.showPage()
         page_background.save()
 
@@ -90,56 +141,10 @@ class Page:
             (self.config['page_border'] - self.config['overlap']) * pdf_unit
         )
 
-        page_overlay_file = cStringIO.StringIO()
-        page_overlay = canvas.Canvas(page_overlay_file, pagesize=page_size_pdf)
-        page_overlay.setFillColor(colors.white)
-        if self.config['overlap'] < self.config['page_border']:
-            page_overlay.rect(
-                0, 0, \
-                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
-                page_size_pdf[1], \
-                stroke=0, fill=1
-            )
-            page_overlay.rect(
-                page_size_pdf[0] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
-                0, \
-                page_size_pdf[0], \
-                page_size_pdf[1], \
-                stroke=0, fill=1
-            )
-            page_overlay.rect(
-                0, 0, \
-                page_size_pdf[0], \
-                (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
-                stroke=0, fill=1
-            )
-            page_overlay.rect(
-                0, \
-                page_size_pdf[1] - (self.config['page_border'] - self.config['overlap']) * pdf_unit, \
-                page_size_pdf[0], \
-                page_size_pdf[1], \
-                stroke=0, fill=1
-            )
-
-        page_overlay.showPage()
-        page_overlay.save()
-
-        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
-        page_final.mergePage(page_overlay)
-        page_overlay_file.close()
+        self.crop_map(page_final)
         page_background_file.close()
 
-# Create HTML-page as overlay
-        page_overlay_file = cStringIO.StringIO()
-        content = file('template-page.html', 'r').read()
-        content = content.format(
-            page_number=str(self.config['page_number'])
-        )
-        pdf = pisa.CreatePDF(cStringIO.StringIO(content), page_overlay_file)
-
-        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
-        page_final.mergePage(page_overlay)
-        page_overlay_file.close()
+        self.overlay_map(page_final)
 
         final_pdf.addPage(page_final)
 
