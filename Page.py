@@ -2,6 +2,8 @@ from defs import *
 import PyPDF2 as PDF
 from reportlab.pdfgen import canvas
 import reportlab.lib.colors as colors
+import xhtml2pdf.pisa as pisa
+import cStringIO
 
 def page_map_size(config):
     page_map_size_mm = config['page_size'][0] - config['page_border'] * 2,\
@@ -117,13 +119,22 @@ class Page:
                 stroke=0, fill=1
             )
 
-        page_overlay.setFillColor(colors.black)
-        page_overlay.drawString(10, 10, str(self.config['page_number']))
-
         page_overlay.showPage()
         page_overlay.save()
 
+# Create HTML-page as overlay
+        page_overlay = file('tmp3.pdf', 'wb')
+        content = file('template-page.html', 'r').read()
+        content = content.format(
+            page_number=str(self.config['page_number'])
+        )
+        pdf = pisa.CreatePDF(cStringIO.StringIO(content), page_overlay)
+        page_overlay.close()
+
         page_overlay = PDF.PdfFileReader(open('tmp2.pdf', 'rb')).getPage(0)
+        page_final.mergePage(page_overlay)
+
+        page_overlay = PDF.PdfFileReader(open('tmp3.pdf', 'rb')).getPage(0)
         page_final.mergePage(page_overlay)
 
         final_pdf.addPage(page_final)
