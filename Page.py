@@ -73,7 +73,8 @@ class Page:
             round(self.config['page_size'][1] - self.config['page_border'] * 2 + self.config['overlap'] * 2) * pdf_unit
         )
 
-        page_background = canvas.Canvas("tmp1.pdf", pagesize=page_size_pdf)
+        page_background_file = cStringIO.StringIO()
+        page_background = canvas.Canvas(page_background_file, pagesize=page_size_pdf)
         page_background.showPage()
         page_background.save()
 
@@ -82,14 +83,15 @@ class Page:
         print 'pdf', map_size_pdf
         page_map.scaleTo(*map_size_pdf)
 
-        page_final = PDF.PdfFileReader(open('tmp1.pdf', 'rb')).getPage(0)
+        page_final = PDF.PdfFileReader(page_background_file).getPage(0)
 
         page_final.mergeTranslatedPage(page_map,
             (self.config['page_border'] - self.config['overlap']) * pdf_unit,
             (self.config['page_border'] - self.config['overlap']) * pdf_unit
         )
 
-        page_overlay = canvas.Canvas("tmp2.pdf", pagesize=page_size_pdf)
+        page_overlay_file = cStringIO.StringIO()
+        page_overlay = canvas.Canvas(page_overlay_file, pagesize=page_size_pdf)
         page_overlay.setFillColor(colors.white)
         if self.config['overlap'] < self.config['page_border']:
             page_overlay.rect(
@@ -122,20 +124,22 @@ class Page:
         page_overlay.showPage()
         page_overlay.save()
 
+        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
+        page_final.mergePage(page_overlay)
+        page_overlay_file.close()
+        page_background_file.close()
+
 # Create HTML-page as overlay
-        page_overlay = file('tmp3.pdf', 'wb')
+        page_overlay_file = cStringIO.StringIO()
         content = file('template-page.html', 'r').read()
         content = content.format(
             page_number=str(self.config['page_number'])
         )
-        pdf = pisa.CreatePDF(cStringIO.StringIO(content), page_overlay)
-        page_overlay.close()
+        pdf = pisa.CreatePDF(cStringIO.StringIO(content), page_overlay_file)
 
-        page_overlay = PDF.PdfFileReader(open('tmp2.pdf', 'rb')).getPage(0)
+        page_overlay = PDF.PdfFileReader(page_overlay_file).getPage(0)
         page_final.mergePage(page_overlay)
-
-        page_overlay = PDF.PdfFileReader(open('tmp3.pdf', 'rb')).getPage(0)
-        page_final.mergePage(page_overlay)
+        page_overlay_file.close()
 
         final_pdf.addPage(page_final)
 
