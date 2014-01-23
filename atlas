@@ -17,14 +17,15 @@ if __name__ == "__main__":
         'output': "map.pdf",
         'ranges': [{
             'id': 'main',
-            'bounds': (15.4410,47.072,15.4451,47.0664),
-            'scale': 2000
+            'bounds': (13.8528, 48.6887, 13.898, 48.713),
+            'scale': 20000
         },
-        {
-            'include_page_bounds': [ 'main' ],
-            'bounds': (15.4,47.0,15.5,47.1),
-            'scale': 100000
-        }]
+#        {
+#            'include_page_bounds': [ 'main' ],
+#            'bounds': (13.785, 48.764, 14.064, 48.545),
+#            'scale': 140000
+#        }
+        ]
     }
 
     # Load Page Ranges
